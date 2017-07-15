@@ -76,7 +76,6 @@
     <Compile Include="Win32Native.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ScriptHookVDotNet.dll" />
     <Content Include="ScriptHookVDotNet2.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

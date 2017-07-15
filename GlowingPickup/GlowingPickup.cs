@@ -22,24 +22,23 @@ namespace GlowingPickup
 
         private void OnTick(object o, EventArgs e)
         {
-			var pickupAddr = PickupObjectPoolTask.GetPickupObjectAddresses();
+            var pickupAddresses = PickupObjectPoolTask.GetPickupObjectAddresses();
 
-			foreach (var pickup in pickupAddr)
-			{
+            foreach (var pickupAddr in pickupAddresses)
+            {
 
-				var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
+                var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
 
-				unsafe
+                unsafe
                 {
-					var posX = BitConverter.ToSingle(BitConverter.GetBytes(Marshal.ReadInt32(pickup, 0x90)), 0);
-					var posY = BitConverter.ToSingle(BitConverter.GetBytes(Marshal.ReadInt32(pickup, 0x94)), 0);
-					var posZ = BitConverter.ToSingle(BitConverter.GetBytes(Marshal.ReadInt32(pickup, 0x98)), 0);
-					var dataAddress = Marshal.ReadIntPtr(pickup, offset);
+                    var pos = *(Vector3*)(pickupAddr + 0x90);
+
+                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, offset);
 
                     if (dataAddress != IntPtr.Zero)
                     {
 
-						var red = (int)(BitConverter.ToSingle(
+                        var red = (int)(BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x5C)), 0) * 255);
                         var green = (int)(BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x60)), 0) * 255);
@@ -51,21 +50,21 @@ namespace GlowingPickup
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * 3f;
                         var darkIntensity = BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * 3f;
-                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, posX, posY, posZ, red,
+                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, red,
                         green, blue, range, intensity, darkIntensity);
                     }
                     else
                     {
-                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, posX, posY, posZ, 255, 57, 0, 5.0f, 30.0f, 10.0f);
+                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, 255, 57, 0, 5.0f, 30.0f, 10.0f);
                     }
                 }
-			}
+            }
 
-			// AddEntityToPoolFunc in GetPickupObjectHandles() isn't working
+            // AddEntityToPoolFunc in GetPickupObjectHandles() isn't working
 
-			/*  var pickupProps = PickupObjectPoolTask.GetPickupObjectHandles();
-				foreach (var pickup in pickupProps)
-			{
+            /*  var pickupProps = PickupObjectPoolTask.GetPickupObjectHandles();
+                foreach (var pickup in pickupProps)
+            {
                 //0x470 - in biker update
 
                 var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
@@ -100,6 +99,6 @@ namespace GlowingPickup
                     }
                 }
             }*/
-		}
-	}
+        }
+    }
 }

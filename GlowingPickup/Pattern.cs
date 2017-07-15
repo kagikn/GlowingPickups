@@ -6,32 +6,32 @@ using System.Threading.Tasks;
 
 namespace GlowingPickup
 {
-	public unsafe sealed class Pattern
-	{
-		private byte[] bytes;
-		private char[] mask;
-		private bool isAttempted;
-		private IntPtr result;
+    public unsafe sealed class Pattern
+    {
+        private byte[] bytes;
+        private char[] mask;
+        private bool isAttempted;
+        private IntPtr result;
 
-		public Pattern(byte[] bytes, string mask)
-		{
-			this.bytes = bytes;
-			this.mask = mask.ToCharArray();
-		}
+        public Pattern(byte[] bytes, string mask)
+        {
+            this.bytes = bytes;
+            this.mask = mask.ToCharArray();
+        }
 
-		public IntPtr Get(int offset = 0)
-		{
-			if (!isAttempted)
-			{
-				result = FindPattern();
-			}
+        public IntPtr Get(int offset = 0)
+        {
+            if (!isAttempted)
+            {
+                result = FindPattern();
+            }
 
-			return result;
-		}
+            return result;
+        }
 
         public IntPtr FindPattern()
         {
-			isAttempted = true;
+            isAttempted = true;
 
             MODULEINFO module;
 
@@ -45,7 +45,7 @@ namespace GlowingPickup
             {
                 if (bCompare(address, bytes, mask))
                 {
-                    return new IntPtr(address);				
+                    return new IntPtr(address);                
                 }
             }
 
