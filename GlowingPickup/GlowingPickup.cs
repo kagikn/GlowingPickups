@@ -42,13 +42,14 @@ namespace GlowingPickup
                 {
                     var pos = *(Vector3*)(pickupAddr + 0x90);
 
-                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, offset);
                     var isVisible = (Marshal.ReadByte(pickupAddr, 0x2C) & 0x01) == 1;
 
                     if (!isVisible)
                     {
                         continue;
                     }
+
+                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, offset);
 
                     if (dataAddress != IntPtr.Zero)
                     {
