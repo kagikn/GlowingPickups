@@ -20,12 +20,11 @@ namespace GlowingPickup
         public GlowingPickup()
         {
             settings = Util.ReadSettings(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "GlowingPickup.xml");
+            PickupObjectPoolTask.Init();
 
             Tick += OnTick;
             Interval = 0;
         }
-
-
 
         private void OnTick(object o, EventArgs e)
         {

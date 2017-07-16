@@ -23,7 +23,7 @@ namespace GlowingPickup
         public float Y;
         [FieldOffset(0x8)]
         public float Z;
-    };
+    }
 
     [StructLayout(LayoutKind.Explicit)]
     public struct EntityPool
@@ -35,7 +35,7 @@ namespace GlowingPickup
         {
             return num1 - (num2 & 0x3FFFFFFF) <= 256;
         }
-    };
+    }
 
     [StructLayout(LayoutKind.Explicit)]
     public unsafe struct GenericPool
@@ -65,7 +65,7 @@ namespace GlowingPickup
             long  num1 = byteArray[index] & 0x80;
             return ~((num1 | -num1) >> 63);
         }
-    };
+    }
 
     unsafe public static class PickupObjectPoolTask
     {
@@ -77,27 +77,16 @@ namespace GlowingPickup
 
         static List<int> _handles = new List<int>();
 
+        static public void Init()
+        {
+            FindEntityPoolAddress();
+            FindPickupPoolAddress();
+            //FindAddEntityToPoolFuncAddress();
+        }
         static public uint GetPickupCount()
         {
-            if (_EntityPoolAddress == IntPtr.Zero)
-            {
-                var address = (byte*)new Pattern(new byte[] { 0x4C, 0x8B, 0x0D, 0, 0, 0, 0, 0x44, 0x8B, 0xC1, 0x49, 0x8B, 0x41, 0x08 }, "xxx????xxxxxxx").Get().ToPointer();
-                address = (*(int*)(address + 3) + address + 7);
-                _EntityPoolAddress = new IntPtr(*(long*)address);
-            }
-            if (_PickupObjectPoolAddress == IntPtr.Zero)
-            {
-                var address = (byte*)new Pattern(new byte[] { 0x8B, 0xF0, 0x48, 0x8B, 0x05, 0, 0, 0, 0, 0xF3, 0x0F, 0x59, 0xF6 }, "xxxxx????xxxx").Get().ToPointer();
-                address = (*(int*)(address + 5) + address + 9);
-                _PickupObjectPoolAddress = new IntPtr(*(long*)address);
-            }
-            if (_addEntToPoolFunc == null)
-            {
-                var bytes = new byte[] { 0x48, 0xF7, 0xF9, 0x49, 0x8B, 0x48, 0x08, 0x48, 0x63, 0xD0, 0xC1, 0xE0, 0x08, 0x0F, 0xB6, 0x1C, 0x11, 0x03, 0xD8 };
-                IntPtr pointer = IntPtr.Subtract(new Pattern(bytes, "xxxxxxxxxxxxxxxxxxx").Get(), 0x68);
-                _addEntToPoolFunc = (AddEntityToPoolFunc)Marshal.GetDelegateForFunctionPointer(pointer, typeof(AddEntityToPoolFunc));
-                _AddEntityToPoolFuncAddress = pointer;
-            }
+            FindEntityPoolAddress();
+            FindPickupPoolAddress();
 
             GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
 
@@ -115,18 +104,8 @@ namespace GlowingPickup
 
         static public List<int> GetPickupObjectHandles()
         {
-            if (_PickupObjectPoolAddress == IntPtr.Zero)
-            {                
-                var address = (byte*)new Pattern(new byte[] { 0x8B, 0xF0, 0x48, 0x8B, 0x05, 0, 0, 0, 0, 0xF3, 0x0F, 0x59, 0xF6 }, "xxxxx????xxxx").Get().ToPointer();
-                address = (*(int*)(address + 5) + address + 9);
-                _PickupObjectPoolAddress = new IntPtr(*(long*)address);
-            }
-            if (_EntityPoolAddress == IntPtr.Zero)
-            {
-                var address = (byte*)new Pattern(new byte[] { 0x4C, 0x8B, 0x0D, 0, 0, 0, 0, 0x44, 0x8B, 0xC1, 0x49, 0x8B, 0x41, 0x08 }, "xxx????xxxxxxx").Get().ToPointer();
-                address = (*(int*)(address + 3) + address + 7);
-                _EntityPoolAddress = new IntPtr(*(long*)address);
-            }
+            FindEntityPoolAddress();
+            FindPickupPoolAddress();
 
             GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
             EntityPool* entitiesPool = (EntityPool*)(_EntityPoolAddress.ToPointer());
@@ -147,19 +126,11 @@ namespace GlowingPickup
 
                     if (address != 0)
                     {
-                        if (_addEntToPoolFunc == null)
-                        {
-                            var bytes = new byte[] { 0x48, 0xF7, 0xF9, 0x49, 0x8B, 0x48, 0x08, 0x48, 0x63, 0xD0, 0xC1, 0xE0, 0x08, 0x0F, 0xB6, 0x1C, 0x11, 0x03, 0xD8 };
-                            IntPtr pointer = IntPtr.Subtract(new Pattern(bytes, "xxxxxxxxxxxxxxxxxxx").Get(), 0x68);
-                            _addEntToPoolFunc = (AddEntityToPoolFunc)Marshal.GetDelegateForFunctionPointer(pointer, typeof(AddEntityToPoolFunc));
-                            _AddEntityToPoolFuncAddress = pointer;
-                        }
+                        FindAddEntityToPoolFuncAddress();
 
                         int handle;
                         handle = _addEntToPoolFunc(address); //this somehow crashes GTA even if address contains a proper memory address value
                         pickupsHandle.Add(handle);
-                        
-
                     }
                 }
             }
@@ -168,22 +139,11 @@ namespace GlowingPickup
 
         static public List<IntPtr> GetPickupObjectAddresses()
         {
-            if (_PickupObjectPoolAddress == IntPtr.Zero)
-            {
-                var address = (byte*)new Pattern(new byte[] { 0x8B, 0xF0, 0x48, 0x8B, 0x05, 0, 0, 0, 0, 0xF3, 0x0F, 0x59, 0xF6 }, "xxxxx????xxxx").Get().ToPointer();
-                address = (*(int*)(address + 5) + address + 9);
-                _PickupObjectPoolAddress = new IntPtr(*(long*)address);
-            }
-            if (_EntityPoolAddress == IntPtr.Zero)
-            {
-                var address = (byte*)new Pattern(new byte[] { 0x4C, 0x8B, 0x0D, 0, 0, 0, 0, 0x44, 0x8B, 0xC1, 0x49, 0x8B, 0x41, 0x08 }, "xxx????xxxxxxx").Get().ToPointer();
-                address = (*(int*)(address + 3) + address + 7);
-                _EntityPoolAddress = new IntPtr(*(long*)address);
-            }
+            FindEntityPoolAddress();
+            FindPickupPoolAddress();
 
             GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
             EntityPool* entitiesPool = (EntityPool*)(_EntityPoolAddress.ToPointer());
-            //int cnt = 0;
 
             List<IntPtr> pickupsHandle = new List<IntPtr>();
 
@@ -207,6 +167,36 @@ namespace GlowingPickup
             }
             return pickupsHandle;
         }
-    };
+
+
+        static public void FindEntityPoolAddress()
+        {
+            if (_EntityPoolAddress == IntPtr.Zero)
+            {
+                var address = (byte*)new Pattern(new byte[] { 0x4C, 0x8B, 0x0D, 0, 0, 0, 0, 0x44, 0x8B, 0xC1, 0x49, 0x8B, 0x41, 0x08 }, "xxx????xxxxxxx").Get().ToPointer();
+                address = (*(int*)(address + 3) + address + 7);
+                _EntityPoolAddress = new IntPtr(*(long*)address);
+            }
+        }
+        static public void FindPickupPoolAddress()
+        {
+            if (_PickupObjectPoolAddress == IntPtr.Zero)
+            {
+                var address = (byte*)new Pattern(new byte[] { 0x8B, 0xF0, 0x48, 0x8B, 0x05, 0, 0, 0, 0, 0xF3, 0x0F, 0x59, 0xF6 }, "xxxxx????xxxx").Get().ToPointer();
+                address = (*(int*)(address + 5) + address + 9);
+                _PickupObjectPoolAddress = new IntPtr(*(long*)address);
+            }
+        }
+        static public void FindAddEntityToPoolFuncAddress()
+        {
+            if (_addEntToPoolFunc == null)
+            {
+                var bytes = new byte[] { 0x48, 0xF7, 0xF9, 0x49, 0x8B, 0x48, 0x08, 0x48, 0x63, 0xD0, 0xC1, 0xE0, 0x08, 0x0F, 0xB6, 0x1C, 0x11, 0x03, 0xD8 };
+                IntPtr pointer = IntPtr.Subtract(new Pattern(bytes, "xxxxxxxxxxxxxxxxxxx").Get(), 0x68);
+                _addEntToPoolFunc = (AddEntityToPoolFunc)Marshal.GetDelegateForFunctionPointer(pointer, typeof(AddEntityToPoolFunc));
+                _AddEntityToPoolFuncAddress = pointer;
+            }
+        }
+    }
 
 }
