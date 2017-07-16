@@ -58,9 +58,9 @@ namespace GlowingPickup
                         var range = BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x10)), 0) * settings.RangeMultiplier;
                         var intensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * settings.IntensityMultiplier;
+                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * settings.LightIntensityMultiplier;
                         var darkIntensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * settings.DarkIntensityMultiplier;
+                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * settings.ShadowMultiplier;
                         Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, red,
                         green, blue, range, intensity, darkIntensity);
                     }

@@ -9,8 +9,8 @@ namespace GlowingPickup
     public class Setting
     {
         public float RangeMultiplier { get; set; } = 1f;
-        public float IntensityMultiplier { get; set; } = 3f;
-        public float DarkIntensityMultiplier { get; set; } = 3f;
+        public float LightIntensityMultiplier { get; set; } = 5f;
+        public float ShadowMultiplier { get; set; } = 5f;
 
         public Setting()
         {
