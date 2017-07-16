@@ -45,7 +45,7 @@ namespace GlowingPickup
             {
                 if (bCompare(address, bytes, mask))
                 {
-                    return new IntPtr(address);                
+                    return new IntPtr(address);
                 }
             }
 
