@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Windows.Forms;
 using GTA;
 using GTA.Native;
@@ -13,15 +15,25 @@ namespace GlowingPickup
 {
     public class GlowingPickup : Script
     {
+        Setting settings;
 
         public GlowingPickup()
         {
+            settings = Util.ReadSettings(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "GlowingPickup.xml");
+
             Tick += OnTick;
             Interval = 0;
         }
 
+
+
         private void OnTick(object o, EventArgs e)
         {
+            if (settings != null)
+            {
+                return;
+            }
+
             var pickupAddresses = PickupObjectPoolTask.GetPickupObjectAddresses();
 
             foreach (var pickupAddr in pickupAddresses)
@@ -45,11 +57,11 @@ namespace GlowingPickup
                         var blue = (int)(BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x64)), 0) * 255);
                         var range = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x10)), 0);
+                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x10)), 0) * settings.RangeMultiplier;
                         var intensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * 3f;
+                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * settings.IntensityMultiplier;
                         var darkIntensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * 3f;
+                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * settings.DarkIntensityMultiplier;
                         Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, red,
                         green, blue, range, intensity, darkIntensity);
                     }
