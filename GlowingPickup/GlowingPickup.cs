@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using GTA;
@@ -19,7 +20,7 @@ namespace GlowingPickup
 
         public GlowingPickup()
         {
-            settings = Util.ReadSettings(AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "GlowingPickup.xml");
+            settings = Util.ReadSettings((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath.Replace("dll", "xml"));
             PickupObjectPoolTask.Init();
 
             Tick += OnTick;
