@@ -34,15 +34,12 @@ namespace GlowingPickup
                 return;
             }
 
+            var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
+
             foreach (var pickupAddr in PickupObjectPoolTask.GetPickupObjectAddresses())
             {
-
-                var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
-
                 unsafe
                 {
-                    var pos = *(Vector3*)(pickupAddr + 0x90);
-
                     var isVisible = (Marshal.ReadByte(pickupAddr, 0x2C) & 0x01) == 1;
 
                     if (!isVisible)
@@ -50,6 +47,7 @@ namespace GlowingPickup
                         continue;
                     }
 
+                    var pos = *(Vector3*)(pickupAddr + 0x90);
                     var dataAddress = Marshal.ReadIntPtr(pickupAddr, offset);
 
                     if (dataAddress != IntPtr.Zero)
