@@ -28,7 +28,7 @@ namespace GlowingPickup
 
         private void OnTick(object o, EventArgs e)
         {
-            if (settings != null)
+            if (settings == null)
             {
                 return;
             }
