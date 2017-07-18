@@ -20,7 +20,8 @@ namespace GlowingPickup
 
         public GlowingPickup()
         {
-            settings = Util.ReadSettings((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath.Replace("dll", "xml"));
+            string xmlPath = Path.ChangeExtension((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath, "xml");
+            settings = Util.ReadSettings(xmlPath);
             PickupObjectPoolTask.Init();
 
             Tick += OnTick;
