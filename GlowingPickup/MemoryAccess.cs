@@ -15,17 +15,6 @@ namespace GlowingPickup
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    public struct NativeVector3
-    {
-        [FieldOffset(0x0)]
-        public float X;
-        [FieldOffset(0x4)]
-        public float Y;
-        [FieldOffset(0x8)]
-        public float Z;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
     public struct EntityPool
     {
         [FieldOffset(0x10)] UInt32 num1;
