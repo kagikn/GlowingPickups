@@ -7,8 +7,8 @@
     <ProjectGuid>{E1081B81-EEFC-442C-B984-E06CBFD04C11}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GlowingPickup</RootNamespace>
-    <AssemblyName>GlowingPickup</AssemblyName>
+    <RootNamespace>GlowingPickups</RootNamespace>
+    <AssemblyName>GlowingPickups</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -68,7 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GlowingPickup.cs" />
+    <Compile Include="GlowingPickups.cs" />
     <Compile Include="MemoryAccess.cs" />
     <Compile Include="MODULEINFO.cs" />
     <Compile Include="Pattern.cs" />

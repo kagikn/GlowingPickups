@@ -12,13 +12,13 @@ using GTA.Native;
 using GTA.Math;
 using System.Runtime.InteropServices;
 
-namespace GlowingPickup
+namespace GlowingPickups
 {
-    public class GlowingPickup : Script
+    public class GlowingPickups : Script
     {
         Setting settings;
 
-        public GlowingPickup()
+        public GlowingPickups()
         {
             var xmlPath = Path.ChangeExtension((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath, "xml");
             var settingLoader = new SettingLoader<Setting>();

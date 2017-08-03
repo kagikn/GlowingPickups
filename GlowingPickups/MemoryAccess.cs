@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using GTA;
 
-namespace GlowingPickup
+namespace GlowingPickups
 {
     static internal class MemoryAccess
     {

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace GlowingPickup
+namespace GlowingPickups
 {
     public static class Win32Native
     {

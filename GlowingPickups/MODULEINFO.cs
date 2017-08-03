@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace GlowingPickup
+namespace GlowingPickups
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct MODULEINFO

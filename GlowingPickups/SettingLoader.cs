@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace GlowingPickup
+namespace GlowingPickups
 {
     public class SettingLoader<T> where T : class, new()
     {
