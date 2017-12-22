@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -38,7 +39,6 @@ namespace GlowingPickups
         [FieldOffset(0x14)]
         public uint itemSize;
 
-
         public bool IsValid(uint index)
         {
             return index < size && Mask(index) != 0;
@@ -51,7 +51,7 @@ namespace GlowingPickups
 
         public long Mask(uint index)
         {
-            long  num1 = byteArray[index] & 0x80;
+            long num1 = byteArray[index] & 0x80;
             return ~((num1 | -num1) >> 63);
         }
     }
@@ -110,7 +110,7 @@ namespace GlowingPickups
 
                 if (pickupPool->IsValid(i))
                 {
-                
+
                     ulong address = (ulong)pickupPool->GetAddress(i).ToInt64();
 
                     if (address != 0)
@@ -142,7 +142,7 @@ namespace GlowingPickups
                 {
                     break;
                 }
-                
+
                 if (pickupPool->IsValid(i))
                 {
 
@@ -186,6 +186,30 @@ namespace GlowingPickups
                 _AddEntityToPoolFuncAddress = pointer;
             }
         }
-    }
 
+        public unsafe static byte* FindPattern(string pattern, string mask)
+        {
+            ProcessModule module = Process.GetCurrentProcess().MainModule;
+
+            ulong address = (ulong)module.BaseAddress.ToInt64();
+            ulong endAddress = address + (ulong)module.ModuleMemorySize;
+
+            for (; address < endAddress; address++)
+            {
+                for (int i = 0; i < pattern.Length; i++)
+                {
+                    if (mask[i] != '?' && ((byte*)address)[i] != pattern[i])
+                    {
+                        break;
+                    }
+                    else if (i + 1 == pattern.Length)
+                    {
+                        return (byte*)address;
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
 }
