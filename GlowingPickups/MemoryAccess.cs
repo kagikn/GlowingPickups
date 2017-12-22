@@ -9,6 +9,31 @@ namespace GlowingPickups
 {
     static internal class MemoryAccess
     {
+        public unsafe static byte* FindPattern(string pattern, string mask)
+        {
+            ProcessModule module = Process.GetCurrentProcess().MainModule;
+
+            ulong address = (ulong)module.BaseAddress.ToInt64();
+            ulong endAddress = address + (ulong)module.ModuleMemorySize;
+
+            for (; address < endAddress; address++)
+            {
+                for (int i = 0; i < pattern.Length; i++)
+                {
+                    if (mask[i] != '?' && ((byte*)address)[i] != pattern[i])
+                    {
+                        break;
+                    }
+                    else if (i + 1 == pattern.Length)
+                    {
+                        return (byte*)address;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static Prop[] GetAllPickupObjects()
         {
             return Array.ConvertAll(PickupObjectPoolTask.GetPickupObjectHandles().ToArray(), handle => new Prop(handle));
@@ -112,7 +137,7 @@ namespace GlowingPickups
         {
             if (_EntityPoolAddress == IntPtr.Zero)
             {
-                var address = FindPattern("\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08", "xxx????xxxxxxx");
+                var address = MemoryAccess.FindPattern("\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08", "xxx????xxxxxxx");
                 _EntityPoolAddress = new IntPtr(*(long*)address);
             }
         }
@@ -120,7 +145,7 @@ namespace GlowingPickups
         {
             if (_PickupObjectPoolAddress == IntPtr.Zero)
             {
-                var address = FindPattern("\x8B\xF0\x48\x8B\x05\x00\x00\x00\x00\xF3\x0F\x59\xF6", "xxxxx????xxxx");
+                var address = MemoryAccess.FindPattern("\x8B\xF0\x48\x8B\x05\x00\x00\x00\x00\xF3\x0F\x59\xF6", "xxxxx????xxxx");
                 _PickupObjectPoolAddress = new IntPtr(*(long*)(*(int*)(address + 5) + address + 9));
             }
         }
@@ -128,36 +153,11 @@ namespace GlowingPickups
         {
             if (_addEntToPoolFunc == null)
             {
-                var address = FindPattern("\x48\xF7\xF9\x49\x8B\x48\x08\x48\x63\xD0\xC1\xE0\x08\x0F\xB6\x1C\x11\x03\xD8", "xxxxxxxxxxxxxxxxxxx");
+                var address = MemoryAccess.FindPattern("\x48\xF7\xF9\x49\x8B\x48\x08\x48\x63\xD0\xC1\xE0\x08\x0F\xB6\x1C\x11\x03\xD8", "xxxxxxxxxxxxxxxxxxx");
                 IntPtr pointer = new IntPtr(address - 0x68);
                 _addEntToPoolFunc = (AddEntityToPoolFunc)Marshal.GetDelegateForFunctionPointer(pointer, typeof(AddEntityToPoolFunc));
                 _AddEntityToPoolFuncAddress = pointer;
             }
-        }
-
-        public unsafe static byte* FindPattern(string pattern, string mask)
-        {
-            ProcessModule module = Process.GetCurrentProcess().MainModule;
-
-            ulong address = (ulong)module.BaseAddress.ToInt64();
-            ulong endAddress = address + (ulong)module.ModuleMemorySize;
-
-            for (; address < endAddress; address++)
-            {
-                for (int i = 0; i < pattern.Length; i++)
-                {
-                    if (mask[i] != '?' && ((byte*)address)[i] != pattern[i])
-                    {
-                        break;
-                    }
-                    else if (i + 1 == pattern.Length)
-                    {
-                        return (byte*)address;
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }
