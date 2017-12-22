@@ -91,7 +91,7 @@ namespace GlowingPickups
             return count;
         }
 
-        static public List<int> GetPickupObjectHandles()
+        static public List<Prop> GetPickupObjectHandles()
         {
             FindEntityPoolAddress();
             FindPickupPoolAddress();
@@ -99,7 +99,7 @@ namespace GlowingPickups
             GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
             EntityPool* entitiesPool = (EntityPool*)(_EntityPoolAddress.ToPointer());
 
-            List<int> pickupsHandle = new List<int>();
+            List<Prop> pickupsHandle = new List<Prop>();
 
             for (uint i = 0; i < pickupPool->size; i++)
             {
@@ -119,7 +119,7 @@ namespace GlowingPickups
 
                         int handle;
                         handle = _addEntToPoolFunc(address);
-                        pickupsHandle.Add(handle);
+                        pickupsHandle.Add(new Prop(handle));
                     }
                 }
             }
