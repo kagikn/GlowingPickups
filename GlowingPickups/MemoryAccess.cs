@@ -99,7 +99,7 @@ namespace GlowingPickups
             GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
             EntityPool* entitiesPool = (EntityPool*)(_EntityPoolAddress.ToPointer());
 
-            List<Prop> pickupsHandle = new List<Prop>();
+            List<Prop> pickupHandles = new List<Prop>();
 
             for (uint i = 0; i < pickupPool->size; i++)
             {
@@ -119,11 +119,11 @@ namespace GlowingPickups
 
                         int handle;
                         handle = _addEntToPoolFunc(address);
-                        pickupsHandle.Add(new Prop(handle));
+                        pickupHandles.Add(new Prop(handle));
                     }
                 }
             }
-            return pickupsHandle;
+            return pickupHandles;
         }
 
         static public List<IntPtr> GetPickupObjectAddresses()
