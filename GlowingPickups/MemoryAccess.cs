@@ -162,8 +162,7 @@ namespace GlowingPickups
         {
             if (_EntityPoolAddress == IntPtr.Zero)
             {
-                var address = (byte*)new Pattern(new byte[] { 0x4C, 0x8B, 0x0D, 0, 0, 0, 0, 0x44, 0x8B, 0xC1, 0x49, 0x8B, 0x41, 0x08 }, "xxx????xxxxxxx").Get().ToPointer();
-                address = (*(int*)(address + 3) + address + 7);
+                var address = FindPattern("\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08", "xxx????xxxxxxx");
                 _EntityPoolAddress = new IntPtr(*(long*)address);
             }
         }
@@ -171,17 +170,16 @@ namespace GlowingPickups
         {
             if (_PickupObjectPoolAddress == IntPtr.Zero)
             {
-                var address = (byte*)new Pattern(new byte[] { 0x8B, 0xF0, 0x48, 0x8B, 0x05, 0, 0, 0, 0, 0xF3, 0x0F, 0x59, 0xF6 }, "xxxxx????xxxx").Get().ToPointer();
-                address = (*(int*)(address + 5) + address + 9);
-                _PickupObjectPoolAddress = new IntPtr(*(long*)address);
+                var address = FindPattern("\x8B\xF0\x48\x8B\x05\x00\x00\x00\x00\xF3\x0F\x59\xF6", "xxxxx????xxxx");
+                _PickupObjectPoolAddress = new IntPtr(*(long*)(*(int*)(address + 5) + address + 9));
             }
         }
         static public void FindAddEntityToPoolFuncAddress()
         {
             if (_addEntToPoolFunc == null)
             {
-                var bytes = new byte[] { 0x48, 0xF7, 0xF9, 0x49, 0x8B, 0x48, 0x08, 0x48, 0x63, 0xD0, 0xC1, 0xE0, 0x08, 0x0F, 0xB6, 0x1C, 0x11, 0x03, 0xD8 };
-                IntPtr pointer = IntPtr.Subtract(new Pattern(bytes, "xxxxxxxxxxxxxxxxxxx").Get(), 0x68);
+                var address = FindPattern("\x48\xF7\xF9\x49\x8B\x48\x08\x48\x63\xD0\xC1\xE0\x08\x0F\xB6\x1C\x11\x03\xD8", "xxxxxxxxxxxxxxxxxxx");
+                IntPtr pointer = new IntPtr(address - 0x68);
                 _addEntToPoolFunc = (AddEntityToPoolFunc)Marshal.GetDelegateForFunctionPointer(pointer, typeof(AddEntityToPoolFunc));
                 _AddEntityToPoolFuncAddress = pointer;
             }
