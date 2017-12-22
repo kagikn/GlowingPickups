@@ -70,7 +70,7 @@ namespace GlowingPickups
         {
             FindEntityPoolAddress();
             FindPickupPoolAddress();
-            //FindAddEntityToPoolFuncAddress();
+            FindAddEntityToPoolFuncAddress();
         }
         static public uint GetPickupCount()
         {
@@ -118,7 +118,7 @@ namespace GlowingPickups
                         FindAddEntityToPoolFuncAddress();
 
                         int handle;
-                        handle = _addEntToPoolFunc(address); //this somehow crashes GTA even if address contains a proper memory address value
+                        handle = _addEntToPoolFunc(address);
                         pickupsHandle.Add(handle);
                     }
                 }
