@@ -46,7 +46,6 @@ namespace GlowingPickups
                     var dataAddress = Marshal.ReadIntPtr(new IntPtr(pickup.MemoryAddress), offset);
                     if (dataAddress != IntPtr.Zero)
                     {
-
                         //Color glowingColor;
                         var pos = pickup.Position;
                         var red = (int)(BitConverter.ToSingle(
