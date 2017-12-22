@@ -91,7 +91,7 @@ namespace GlowingPickups
             return count;
         }
 
-        static public List<Prop> GetPickupObjectHandles()
+        static public List<Prop> GetPickupObjects()
         {
             FindEntityPoolAddress();
             FindPickupPoolAddress();

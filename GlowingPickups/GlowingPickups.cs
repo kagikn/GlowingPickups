@@ -38,7 +38,7 @@ namespace GlowingPickups
 
             var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
 
-            var pickupProps = PickupObjectPoolTask.GetPickupObjectHandles();
+            var pickupProps = PickupObjectPoolTask.GetPickupObjects();
             foreach (var pickup in pickupProps)
             {
                 unsafe
