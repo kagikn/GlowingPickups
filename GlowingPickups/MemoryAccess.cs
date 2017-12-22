@@ -72,24 +72,6 @@ namespace GlowingPickups
             FindPickupPoolAddress();
             FindAddEntityToPoolFuncAddress();
         }
-        static public uint GetPickupCount()
-        {
-            FindEntityPoolAddress();
-            FindPickupPoolAddress();
-
-            GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
-
-            uint count = 0;
-            for (uint i = 0; i < pickupPool->size; i++)
-            {
-                if (pickupPool->IsValid(i))
-                {
-                    count++;
-                }
-            }
-
-            return count;
-        }
 
         static public List<Prop> GetPickupObjects()
         {
@@ -125,38 +107,6 @@ namespace GlowingPickups
             }
             return pickupHandles;
         }
-
-        static public List<IntPtr> GetPickupObjectAddresses()
-        {
-            FindEntityPoolAddress();
-            FindPickupPoolAddress();
-
-            GenericPool* pickupPool = (GenericPool*)(_PickupObjectPoolAddress.ToPointer());
-            EntityPool* entitiesPool = (EntityPool*)(_EntityPoolAddress.ToPointer());
-
-            List<IntPtr> pickupsHandle = new List<IntPtr>();
-
-            for (uint i = 0; i < pickupPool->size; i++)
-            {
-                if (entitiesPool->IsFull())
-                {
-                    break;
-                }
-
-                if (pickupPool->IsValid(i))
-                {
-
-                    long address = pickupPool->GetAddress(i).ToInt64();
-
-                    if (address != 0)
-                    {
-                        pickupsHandle.Add(new IntPtr(address));
-                    }
-                }
-            }
-            return pickupsHandle;
-        }
-
 
         static public void FindEntityPoolAddress()
         {
