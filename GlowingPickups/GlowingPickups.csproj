@@ -71,7 +71,6 @@
     <Compile Include="GlowingPickups.cs" />
     <Compile Include="MemoryAccess.cs" />
     <Compile Include="MODULEINFO.cs" />
-    <Compile Include="Pattern.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="SettingLoader.cs" />
