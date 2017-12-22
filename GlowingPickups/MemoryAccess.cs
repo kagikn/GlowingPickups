@@ -33,11 +33,6 @@ namespace GlowingPickups
 
             return null;
         }
-
-        public static Prop[] GetAllPickupObjects()
-        {
-            return Array.ConvertAll(PickupObjectPoolTask.GetPickupObjectHandles().ToArray(), handle => new Prop(handle));
-        }
     }
 
     [StructLayout(LayoutKind.Explicit)]
