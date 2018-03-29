@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -143,8 +143,8 @@ namespace GlowingPickups
         }
         static public void FindPickupPoolAddress()
         {
-            var address = MemoryAccess.FindPattern("\x8B\xF0\x48\x8B\x05\x00\x00\x00\x00\xF3\x0F\x59\xF6", "xxxxx????xxxx");
-            _PickupObjectPoolAddress = new IntPtr((*(int*)(address + 5) + address + 9));
+            var address = MemoryAccess.FindPattern("\x4C\x8B\x05\x00\x00\x00\x00\x40\x8A\xF2\x8B\xE9", "xxx????xxxxx");
+            _PickupObjectPoolAddress = new IntPtr((*(int*)(address + 3) + address + 7));
         }
         static public void FindAddEntityToPoolFuncAddress()
         {
