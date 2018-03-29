@@ -36,19 +36,21 @@ namespace GlowingPickups
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    public struct EntityPool
+    internal struct EntityPool
     {
-        [FieldOffset(0x10)] UInt32 num1;
-        [FieldOffset(0x20)] UInt32 num2;
+        [FieldOffset(0x10)]
+        internal uint num1;
+        [FieldOffset(0x20)]
+        internal uint num2;
 
-        public bool IsFull()
+        internal bool IsFull()
         {
             return num1 - (num2 & 0x3FFFFFFF) <= 256;
         }
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct GenericPool
+    internal unsafe struct GenericPool
     {
         [FieldOffset(0x00)]
         public ulong poolStartAddress;
@@ -83,8 +85,8 @@ namespace GlowingPickups
     unsafe public static class PickupObjectPoolTask
     {
         //static public IntPtr _AddEntityToPoolFuncAddress;
-        static public IntPtr _EntityPoolAddress;
-        static public IntPtr _PickupObjectPoolAddress;
+        static public ulong* _EntityPoolAddress;
+        static public ulong* _PickupObjectPoolAddress;
         internal delegate int AddEntityToPoolFunc(ulong address); //returns an entity handle
         static internal AddEntityToPoolFunc _addEntToPoolFunc;
 
@@ -97,19 +99,16 @@ namespace GlowingPickups
             FindAddEntityToPoolFuncAddress();
         }
 
-        static public List<Prop> GetPickupObjects()
+        //This is unstable and can easily crash the game
+        /*static public List<Prop> GetPickupObjects()
         {
-            //FindEntityPoolAddress();
-            //FindPickupPoolAddress();
-            //FindAddEntityToPoolFuncAddress();
-
-            if (**(ulong**)_EntityPoolAddress.ToPointer() == 0 || *(ulong*)_PickupObjectPoolAddress.ToPointer() == 0)
+            if (*_EntityPoolAddress == 0 || *_PickupObjectPoolAddress == 0)
             {
                 return new List<Prop>();
             }
 
-            GenericPool* pickupPool = (GenericPool*)(*(ulong*)_PickupObjectPoolAddress.ToPointer());
-            EntityPool* entitiesPool = (EntityPool*)(*(ulong*)_EntityPoolAddress.ToPointer());
+            GenericPool* pickupPool = (GenericPool*)(*_PickupObjectPoolAddress);
+            EntityPool* entitiesPool = (EntityPool*)(*_EntityPoolAddress);
 
             List<Prop> pickupHandles = new List<Prop>();
 
@@ -127,24 +126,55 @@ namespace GlowingPickups
 
                     if (address != 0)
                     {
-                        int handle;
-                        handle = _addEntToPoolFunc(address);
+                        int handle = _addEntToPoolFunc(address);
                         pickupHandles.Add(new Prop(handle));
                     }
                 }
             }
             return pickupHandles;
+        }*/
+
+        static public List<IntPtr> GetPickupObjectAddresses()
+        {
+            if (*_EntityPoolAddress == 0 || *_PickupObjectPoolAddress == 0)
+            {
+                return new List<IntPtr>();
+            }
+
+            GenericPool* pickupPool = (GenericPool*)(*_PickupObjectPoolAddress);
+            EntityPool* entitiesPool = (EntityPool*)(*_EntityPoolAddress);
+
+            List<IntPtr> pickupsAddresses = new List<IntPtr>();
+
+            for (uint i = 0; i < pickupPool->size; i++)
+            {
+                if (entitiesPool->IsFull())
+                {
+                    break;
+                }
+
+                if (pickupPool->IsValid(i))
+                {
+                    ulong address = pickupPool->GetAddress(i);
+
+                    if (address != 0)
+                    {
+                        pickupsAddresses.Add(new IntPtr((long)address));
+                    }
+                }
+            }
+            return pickupsAddresses;
         }
 
         static public void FindEntityPoolAddress()
         {
             var address = MemoryAccess.FindPattern("\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08", "xxx????xxxxxxx");
-            _EntityPoolAddress = new IntPtr(*(int*)(address + 3) + address + 7);
+            _EntityPoolAddress = (ulong*)(*(int*)(address + 3) + address + 7);
         }
         static public void FindPickupPoolAddress()
         {
             var address = MemoryAccess.FindPattern("\x4C\x8B\x05\x00\x00\x00\x00\x40\x8A\xF2\x8B\xE9", "xxx????xxxxx");
-            _PickupObjectPoolAddress = new IntPtr((*(int*)(address + 3) + address + 7));
+            _PickupObjectPoolAddress = (ulong*)(*(int*)(address + 3) + address + 7);
         }
         static public void FindAddEntityToPoolFuncAddress()
         {
