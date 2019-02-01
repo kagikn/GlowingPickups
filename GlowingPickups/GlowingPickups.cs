@@ -17,6 +17,7 @@ namespace GlowingPickups
     public class GlowingPickups : Script
     {
         Setting settings;
+        readonly int _pickupDataOffset;
 
         public GlowingPickups()
         {
@@ -24,6 +25,8 @@ namespace GlowingPickups
             var settingLoader = new SettingLoader<Setting>();
             settings = settingLoader.Load(xmlPath) ?? settingLoader.Init(xmlPath);
             PickupObjectPoolTask.Init();
+
+            _pickupDataOffset = GetPickupDataOffset(Game.Version);
 
             Tick += OnTick;
             Interval = 0;
@@ -35,9 +38,6 @@ namespace GlowingPickups
             {
                 return;
             }
-
-            var offset = (int)Game.Version >= (int)GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
-
 
             var pickupAddresses = PickupObjectPoolTask.GetPickupObjectAddresses();
             foreach (var pickupAddr in pickupAddresses)
@@ -52,7 +52,7 @@ namespace GlowingPickups
                     }
 
                     var pos = *(Vector3*)(pickupAddr + 0x90);
-                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, offset);
+                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, _pickupDataOffset);
 
                     if (dataAddress != IntPtr.Zero)
                     {
@@ -77,6 +77,15 @@ namespace GlowingPickups
                     }
                 }
             }
+        }
+
+        //Probably pattern searching is the better way, but I don't know about the pickup data pattern
+        private int GetPickupDataOffset(GameVersion version)
+        {
+            var offset = version >= GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
+            offset = version >= GameVersion.VER_1_0_1604_0_STEAM ? 0x490 : offset;
+
+            return offset;
         }
     }
 }
