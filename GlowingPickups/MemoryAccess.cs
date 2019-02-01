@@ -84,11 +84,8 @@ namespace GlowingPickups
 
     unsafe public static class PickupObjectPoolTask
     {
-        //static public IntPtr _AddEntityToPoolFuncAddress;
         static public ulong* _EntityPoolAddress;
         static public ulong* _PickupObjectPoolAddress;
-        internal delegate int AddEntityToPoolFunc(ulong address); //returns an entity handle
-        static internal AddEntityToPoolFunc _addEntToPoolFunc;
 
         static List<int> _handles = new List<int>();
 
@@ -96,43 +93,7 @@ namespace GlowingPickups
         {
             FindEntityPoolAddress();
             FindPickupPoolAddress();
-            FindAddEntityToPoolFuncAddress();
         }
-
-        //This is unstable and can easily crash the game
-        /*static public List<Prop> GetPickupObjects()
-        {
-            if (*_EntityPoolAddress == 0 || *_PickupObjectPoolAddress == 0)
-            {
-                return new List<Prop>();
-            }
-
-            GenericPool* pickupPool = (GenericPool*)(*_PickupObjectPoolAddress);
-            EntityPool* entitiesPool = (EntityPool*)(*_EntityPoolAddress);
-
-            List<Prop> pickupHandles = new List<Prop>();
-
-            for (uint i = 0; i < pickupPool->size; i++)
-            {
-                if (entitiesPool->IsFull())
-                {
-                    break;
-                }
-
-                if (pickupPool->IsValid(i))
-                {
-
-                    ulong address = pickupPool->GetAddress(i);
-
-                    if (address != 0)
-                    {
-                        int handle = _addEntToPoolFunc(address);
-                        pickupHandles.Add(new Prop(handle));
-                    }
-                }
-            }
-            return pickupHandles;
-        }*/
 
         static public List<IntPtr> GetPickupObjectAddresses()
         {
@@ -175,11 +136,6 @@ namespace GlowingPickups
         {
             var address = MemoryAccess.FindPattern("\x4C\x8B\x05\x00\x00\x00\x00\x40\x8A\xF2\x8B\xE9", "xxx????xxxxx");
             _PickupObjectPoolAddress = (ulong*)(*(int*)(address + 3) + address + 7);
-        }
-        static public void FindAddEntityToPoolFuncAddress()
-        {
-            var address = MemoryAccess.FindPattern("\x48\xF7\xF9\x49\x8B\x48\x08\x48\x63\xD0\xC1\xE0\x08\x0F\xB6\x1C\x11\x03\xD8", "xxxxxxxxxxxxxxxxxxx");
-            _addEntToPoolFunc = Marshal.GetDelegateForFunctionPointer<AddEntityToPoolFunc>(new IntPtr(address - 0x68));
         }
     }
 }
