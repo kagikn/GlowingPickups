@@ -55,24 +55,20 @@ namespace GlowingPickups
                 unsafe
                 {
                     var pos = pickup.Position;
-                    var dataAddress = Marshal.ReadIntPtr(pickup.MemoryAddress, _pickupDataOffset);
+                    var cPickupData = (CPickupData*)Marshal.ReadIntPtr(pickup.MemoryAddress, _pickupDataOffset);
 
-                    if (dataAddress != IntPtr.Zero)
+                    if (cPickupData != null)
                     {
-                        var red = (int)(BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x5C)), 0) * 255);
-                        var green = (int)(BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x60)), 0) * 255);
-                        var blue = (int)(BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x64)), 0) * 255);
-                        var range = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x10)), 0) * settings.RangeMultiplier;
-                        var intensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * settings.LightIntensityMultiplier;
-                        var darkIntensity = BitConverter.ToSingle(
-                            BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * settings.ShadowMultiplier;
+                        var red = (int)(cPickupData->GlowRed * 255);
+                        var green = (int)(cPickupData->GlowGreen * 255);
+                        var blue = (int)(cPickupData->GlowBlue * 255);
+
+                        var range = cPickupData->GlowRange * settings.RangeMultiplier;
+                        var intensity = cPickupData->GlowIntensity * settings.LightIntensityMultiplier;
+                        var falloffExponent = settings.FalloffExponent;
+
                         Function.Call(Hash.DRAW_LIGHT_WITH_RANGEEX, pos.X, pos.Y, pos.Z, red,
-                        green, blue, range, intensity, darkIntensity);
+                        green, blue, range, intensity, falloffExponent);
                     }
                     else
                     {

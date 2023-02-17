@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,7 @@ namespace GlowingPickups
     {
         public float RangeMultiplier { get; set; } = 1f;
         public float LightIntensityMultiplier { get; set; } = 5f;
-        public float ShadowMultiplier { get; set; } = 5f;
+        public float FalloffExponent { get; set; } = 2.5f;
 
         public Setting()
         {
