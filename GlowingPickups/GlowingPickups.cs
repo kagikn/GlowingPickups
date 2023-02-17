@@ -16,7 +16,7 @@ namespace GlowingPickups
 
         public GlowingPickups()
         {
-            var xmlPath = Path.ChangeExtension((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath, "xml");
+            var xmlPath = Path.ChangeExtension(Filename, "xml");
             var settingLoader = new SettingLoader<Setting>();
             settings = settingLoader.Load(xmlPath) ?? settingLoader.Init(xmlPath);
 
