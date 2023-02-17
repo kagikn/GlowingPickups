@@ -1,16 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Threading;
-using System.Windows.Forms;
 using GTA;
 using GTA.Native;
 using GTA.Math;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace GlowingPickups
 {
@@ -24,12 +19,28 @@ namespace GlowingPickups
             var xmlPath = Path.ChangeExtension((new Uri(Assembly.GetExecutingAssembly().CodeBase)).LocalPath, "xml");
             var settingLoader = new SettingLoader<Setting>();
             settings = settingLoader.Load(xmlPath) ?? settingLoader.Init(xmlPath);
-            PickupObjectPoolTask.Init();
 
-            _pickupDataOffset = GetPickupDataOffset(Game.Version);
+            unsafe
+            {
+                var addr = Game.FindPattern("75 37 48 8B 85 ? ? ? ? 40 84 78 0C 75 11");
+                if (addr != IntPtr.Zero)
+                {
+                    _pickupDataOffset = *(int*)(addr + 5);
+                }
+            }
 
-            Tick += OnTick;
-            Interval = 0;
+            if (_pickupDataOffset != 0 && settings != null)
+            {
+                Tick += OnTick;
+                Interval = 0;
+            }
+            else
+            {
+                if (_pickupDataOffset == 0)
+                {
+                    throw new InvalidOperationException("Couldn't find the CPickupData offset of CPickup. Terminating GlowingPickups.");
+                }
+            }
         }
 
         private void OnTick(object o, EventArgs e)
@@ -39,20 +50,12 @@ namespace GlowingPickups
                 return;
             }
 
-            var pickupAddresses = PickupObjectPoolTask.GetPickupObjectAddresses();
-            foreach (var pickupAddr in pickupAddresses)
+            foreach (var pickup in World.GetAllPickupObjects().Where(x => x.IsVisible))
             {
                 unsafe
                 {
-                    var isVisible = (Marshal.ReadByte(pickupAddr, 0x2C) & 0x01) == 1;
-
-                    if (!isVisible)
-                    {
-                        continue;
-                    }
-
-                    var pos = *(Vector3*)(pickupAddr + 0x90);
-                    var dataAddress = Marshal.ReadIntPtr(pickupAddr, _pickupDataOffset);
+                    var pos = pickup.Position;
+                    var dataAddress = Marshal.ReadIntPtr(pickup.MemoryAddress, _pickupDataOffset);
 
                     if (dataAddress != IntPtr.Zero)
                     {
@@ -68,24 +71,15 @@ namespace GlowingPickups
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x68)), 0) * settings.LightIntensityMultiplier;
                         var darkIntensity = BitConverter.ToSingle(
                             BitConverter.GetBytes(Marshal.ReadInt32(dataAddress, 0x6C)), 0) * settings.ShadowMultiplier;
-                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, red,
+                        Function.Call(Hash.DRAW_LIGHT_WITH_RANGEEX, pos.X, pos.Y, pos.Z, red,
                         green, blue, range, intensity, darkIntensity);
                     }
                     else
                     {
-                        Function.Call(Hash._DRAW_LIGHT_WITH_RANGE_WITH_SHADOW, pos.X, pos.Y, pos.Z, 255, 57, 0, 5.0f, 30.0f, 10.0f);
+                        Function.Call(Hash.DRAW_LIGHT_WITH_RANGEEX, pos.X, pos.Y, pos.Z, 255, 57, 0, 5.0f, 30.0f, 10.0f);
                     }
                 }
             }
-        }
-
-        //Probably pattern searching is the better way, but I don't know about the pickup data pattern
-        private int GetPickupDataOffset(GameVersion version)
-        {
-            var offset = version >= GameVersion.VER_1_0_944_2_STEAM ? 0x480 : 0x470;
-            offset = version >= GameVersion.VER_1_0_1604_0_STEAM ? 0x490 : offset;
-
-            return offset;
         }
     }
 }
