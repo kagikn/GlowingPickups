@@ -11,9 +11,9 @@ This script gives pickups the ability to glow with certain color, just like in G
 
 * Grand Theft Auto V
 * [ScriptHookV by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
-* [ScriptHookVDotNet by crosire](https://github.com/crosire/scripthookvdotnet)
-* [Visual C++ Redistributable 2013 x64](https://www.microsoft.com/en-us/download/details.aspx?id=40784)
-* [Microsoft .NET Framework 4.5.2](http://www.microsoft.com/en-us/download/details.aspx?id=42643)
+* [ScriptHookVDotNet by crosire and contributors](https://github.com/crosire/scripthookvdotnet)
+* [Visual C++ Redistributable 2019 x64](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+* [Microsoft .NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
 
 ## Downloads
 
