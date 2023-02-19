@@ -22,7 +22,7 @@ namespace GlowingPickups
 
             unsafe
             {
-                var addr = Game.FindPattern("75 37 48 8B 85 ? ? ? ? 40 84 78 0C 75 11");
+                var addr = Game.FindPattern("75 ? 48 8B 85 ? ? ? ? 40 84 78 0C 75 ? 48 85 F6 0F 84");
                 if (addr != IntPtr.Zero)
                 {
                     _pickupDataOffset = *(int*)(addr + 5);
